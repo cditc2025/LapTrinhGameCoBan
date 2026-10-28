@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Hòa");
                 break;
             case 0:
-                if(player == 1) OpponentPlayMiniMax();
+                if(player == 1) OpponentPlayRandom();
                 break;
             case 1:
                 Debug.Log("X thắng");
@@ -69,85 +69,6 @@ public class GameManager : MonoBehaviour
         int rand = Random.Range(0, empty.Count);
         caros[empty[rand]].Fill(2);
         HandleBoard(2);
-    }    
-
-    public void OpponentPlayMiniMax()
-    {
-        int[,] board = GetCurrentBoard();
-        int highestScore = int.MinValue;
-        int posX = -1;
-        int posY = -1;
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                if (board[i, j] != 0) continue;
-                int score = CalculateMoveScore(board, i, j, 0, 2);
-    
-                if (score > highestScore)
-                {
-                    posX = i;
-                    posY = j;
-                    highestScore = score;
-                }
-            }
-        }
-        //
-        caros[posY * 3 + posX].Fill(2);
-        HandleBoard(2);
-    }    
-
-    int CalculateMoveScore(int[,] board, int posX, int posY ,int depth, int player)
-    {
-        int[,] boardClone = (int[,])board.Clone();
-        boardClone[posX, posY] = player;
-        int winner = CheckWinner(boardClone);
-
-        if (winner != 0 || depth == 5) return GetScoreFromGameState(winner, depth);
-        //
-
-        int score = -100;
-
-        for(int i = 0; i < 3; i ++)
-        {
-            for(int j = 0; j < 3; j ++)
-            {
-                if(boardClone[i,j] == 0)
-                {
-                    int nextPlayer = 3 - player;
-
-                    if (score == -100)
-                    {
-                        score = CalculateMoveScore(boardClone, i, j, depth + 1, nextPlayer);
-                        continue;
-                    }    
-                   
-                    if(nextPlayer == 1)
-                    {
-                        score = Mathf.Min(score, CalculateMoveScore(boardClone, i, j, depth + 1, nextPlayer));
-                    } else
-                    {
-                        score = Mathf.Max(score, CalculateMoveScore(boardClone, i, j, depth + 1, nextPlayer));
-                    }
-
-                }        
-            }    
-        }    
-
-        return score;
-    }    
-
-    int GetScoreFromGameState(int state, int depth)
-    {
-        switch(state)
-        {
-            case 1: 
-                return -10 + depth;
-            case 2: 
-                return 10 - depth;
-            default:
-                return 0;
-        }    
     }    
 
     public int[,] GetCurrentBoard()
